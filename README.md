@@ -71,7 +71,7 @@ Extract labels ranging from 1 to 4, which represent reject, borderline reject, b
 python main.py --task_type parse_score
 ```
 
-Select valid pairs (those labeled as 4) and build query-document datasets for text retrieval evaluation.
+Select valid pairs (those labeled as 4) and build query-document datasets for text retrieval evaluation. The pairs are saved in the `data/{task_name}/pairs.jsonl` folder.
 
 ```bash
 python main.py --task_type build_dataset

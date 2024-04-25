@@ -114,7 +114,7 @@ def main():
             if pair['gpt4_score'] in valid_labels:
                 valid_pairs.append({'query': pair['query'], 'doc': pair['doc'], 'corpus_id': pair['doc_id'], 'query_id': pair['query_id']})
 
-        outname = f'{filtered_pair_path}/pairs.jsonl'
+        outname = f'{data_path}/pairs.jsonl'
         print('save %d pairs to %s' % (len(valid_pairs), outname))
         save_json_lines(outname, valid_pairs)
     
