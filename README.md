@@ -1,7 +1,7 @@
 # Auto Labelling for Text Retrieval Evaluation
 This GitHub repository provides code for constructing query-document pairs for text retrieval evaluation. Given a set of queries and documents, the queries can include questions, titles, abstracts, or summaries, while the documents may contain relevant information about the queries. This code helps in building a dataset with GPT-4 labeled query-document pairs for evaluating text retrieval.
 
-## Preparing data
+## Prepare data
 Store the queries and documents in the `data/{task_name}` directory:
 
 `query.jsonl` should include the query id and query text.
