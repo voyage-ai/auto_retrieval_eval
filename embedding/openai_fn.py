@@ -2,7 +2,6 @@ from typing import List
 from tqdm import tqdm
 import pdb
 import tiktoken
-
 from setup_api import openai_api
 
 class OpenAIEmbedding():

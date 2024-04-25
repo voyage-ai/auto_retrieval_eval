@@ -1,9 +1,7 @@
 from typing import List, Optional
 from tqdm import tqdm
 import time
-
 from vertexai.language_models import TextEmbeddingModel
-
 from setup_api import google_vertex_api
 
 class GoogleEmbedding():

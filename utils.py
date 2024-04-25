@@ -1,6 +1,5 @@
 import pickle
 import json
-import pdb
 
 def read_json(data_path):
     with open(data_path, 'r') as json_file:
@@ -16,7 +15,6 @@ def read_json_lines(data_path):
             except json.JSONDecodeError as e:
                 print(f"Error decoding JSON: {e}")
                 print('Line:', idx)
-                pdb.set_trace()
             data.append(data_line)
     return data
 

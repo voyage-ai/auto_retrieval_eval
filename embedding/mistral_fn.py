@@ -3,7 +3,6 @@ from tqdm import tqdm
 import time
 from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained('stabilityai/StableBeluga2', cache_fir = './', use_fast = False)
-
 from setup_api import mistral_api
 
 class MistralEmbedding():

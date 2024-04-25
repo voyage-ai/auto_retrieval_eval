@@ -57,7 +57,7 @@ Combine the top-k documents from various embedding models:
 python generate_pairs.py --task_type merge_pairs
 ```
 
-## Labeling query-document pairs using GPT4
+## Label query-document pairs using GPT4
 
 For each query-document pair, use GPT-4 to determine if they are a good match. The document and query are assessed as a pair based on criteria that are divided into four levels: reject (label 1), borderline reject (label 2), borderline accept (label 3), and accept (label 4).
 
