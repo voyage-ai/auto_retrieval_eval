@@ -33,15 +33,9 @@ topk = 20
 generative_model = 'gpt-4-0125-preview'
 ```
 
-Store your API keys in the `api_key` folder. 
+## API Key Configuration
 
-Based on the embedding and generative models you are using, save the keys into the corresponding files.
-
-    api_keys/voyage_key.txt
-    api_keys/openai_key.txt
-    api_keys/mistral_key.txt
-    api_keys/cohere_key.txt
-    api_keys/google_vertex.txt
+To configure API keys using environment variables, please store them in a `.env` file located in the root directory of your project.
 
 ## Generate query-document pairs
 
