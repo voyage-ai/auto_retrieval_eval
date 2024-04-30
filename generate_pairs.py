@@ -5,13 +5,6 @@ from config import Config
 from utils import parse_arguments, read_json, read_json_lines, save_json_lines, create_directories
 from embedding.embedding_fn import generate_embedding
 
-def read_queries_docs(data_path):
-    queries = read_json(f'{data_path}/query.jsonl')
-    corpus = read_json(f'{data_path}/corpus.jsonl')
-    print('there are %d queries' % len(queries))
-    print('there are %d docs' % len(corpus))
-    return queries, corpus
-
 def generate_pairs(data_path, embedding_models, embedding_path, retrieval_path, topk):
     queries = read_json(f'{data_path}/query.jsonl')
     corpus = read_json(f'{data_path}/corpus.jsonl')
@@ -44,39 +37,36 @@ def generate_pairs(data_path, embedding_models, embedding_path, retrieval_path, 
             save_json_lines(model_retrieval_path, pairs)
 
 def merge_pairs(embedding_models, retrieval_path, merged_retrieval_data_path, topk):
-    if os.path.exists(merged_retrieval_data_path):
-        print('---------------------------------------------------------------')
-        print('load merged pairs from %s' % merged_retrieval_data_path)
-    else:
-        print('---------------------------------------------------------------')
-        print('save merged pairs to %s' % merged_retrieval_data_path)
-        pairs_new = []
-        for embedding_model_name in embedding_models:
-            model_retrieval_path = f'{retrieval_path}/pairs_{embedding_model_name}_top{topk}.jsonl'
-            pairs = read_json_lines(model_retrieval_path)
-            for pair in pairs:
-                if pair not in pairs_new:
-                    pairs_new.append(pair)
-                else:
-                    repeated_pairs = [tem for tem in pairs_new if pair['query']==tem['query'] and pair['doc']==tem['doc']]
-                    assert len(repeated_pairs)==1
-        print('there are %d pairs' % len(pairs_new))
 
-        random.shuffle(pairs_new) ## shuffle pairs
-        
-        pairs_new_query_dict = {}
-        for pair in pairs_new:
-            if pair['query_id'] not in pairs_new_query_dict:
-                pairs_new_query_dict[pair['query_id']] = [pair]
+    print('---------------------------------------------------------------')
+    print('save merged pairs to %s' % merged_retrieval_data_path)
+    pairs_new = []
+    for embedding_model_name in embedding_models:
+        model_retrieval_path = f'{retrieval_path}/pairs_{embedding_model_name}_top{topk}.jsonl'
+        pairs = read_json_lines(model_retrieval_path)
+        for pair in pairs:
+            if pair not in pairs_new:
+                pairs_new.append(pair)
             else:
-                pairs_new_query_dict[pair['query_id']].append(pair)
-        print('there are %d queries' % len(pairs_new_query_dict))
+                repeated_pairs = [tem for tem in pairs_new if pair['query']==tem['query'] and pair['doc']==tem['doc']]
+                assert len(repeated_pairs)==1
+    print('There are %d pairs' % len(pairs_new))
 
-        pair_test = []
-        for query_id, _ in pairs_new_query_dict.items():
-            pair_test += [pair for pair in pairs_new if pair['query_id']==query_id]
+    random.shuffle(pairs_new) ## shuffle pairs
+    
+    pairs_new_query_dict = {}
+    for pair in pairs_new:
+        if pair['query_id'] not in pairs_new_query_dict:
+            pairs_new_query_dict[pair['query_id']] = [pair]
+        else:
+            pairs_new_query_dict[pair['query_id']].append(pair)
+    print('There are %d queries' % len(pairs_new_query_dict))
 
-        save_json_lines(merged_retrieval_data_path, pair_test)
+    pair_test = []
+    for query_id, _ in pairs_new_query_dict.items():
+        pair_test += [pair for pair in pairs_new if pair['query_id']==query_id]
+
+    save_json_lines(merged_retrieval_data_path, pair_test)
         
 
 def main():
