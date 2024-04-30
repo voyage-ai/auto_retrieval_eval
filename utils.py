@@ -5,10 +5,10 @@ import argparse
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Configure paths and settings for the project.")
-    parser.add_argument('--task_name', type=str, default='example_task', help='Task name for the dataset.')
-    parser.add_argument('--embedding_models', type=str, default='voyage-large-2,text-embedding-3-large', help='Comma-separated list of embedding models.')
+    parser.add_argument('--task-name', type=str, default='example_task', help='Task name for the dataset.')
+    parser.add_argument('--embedding-models', type=str, default='voyage-large-2,text-embedding-3-large', help='Comma-separated list of embedding models.')
     parser.add_argument('--topk', type=int, default=20, help='Top K retrieved results.')
-    parser.add_argument('--generative_model', type=str, default='gpt-4-0125-preview', help='Generative model name.')
+    parser.add_argument('--generative-model', type=str, default='gpt-4-0125-preview', help='Generative model name.')
     
     args = parser.parse_args()
     return args

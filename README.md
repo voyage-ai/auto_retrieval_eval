@@ -1,5 +1,5 @@
 # Auto Labelling for Text Retrieval Evaluation
-This GitHub repository provides code for constructing query-document pairs for text retrieval evaluation. Given a set of queries and documents, the queries can include questions, titles, abstracts, or summaries, while the documents may contain relevant information about the queries. This code helps in building a dataset with GPT-4 labeled query-document pairs for evaluating text retrieval.
+This repository offers a codebase for generating query-document pairs to assess text retrieval performance. It processes a collection of queries and documents where queries may consist of questions, titles, abstracts, or summaries, and the documents are likely to hold pertinent details concerning these queries. The provided code facilitates the creation of a dataset labeled with GPT-4, specifically designed for evaluating text retrieval capabilities.
 
 ## Prepare data
 Store the queries and documents in the `data/{task_name}` directory:
@@ -16,39 +16,22 @@ Store the queries and documents in the `data/{task_name}` directory:
 "000000001": {"text": "This is the text of the second document."},
 ```
 
-## Setup configurations
-
-Configure settings in `paths.py`: 
-```python
-# Task name
-task_name = 'example_task'
-
-# List of embedding models
-embedding_models = ['voyage-2', 'voyage-code-2', 'text-embedding-3-small', 'text-embedding-3-large', 'embed-english-v3.0', 'mistral', 'googlecloud_textembedding-gecko@latest']
-
-# Number of top retrieved documents selected for each query
-topk = 20
-
-# Model used for generating labels
-generative_model = 'gpt-4-0125-preview'
-```
-
 ## API Key Configuration
 
 To configure API keys using environment variables, please store them in a `.env` file located in the root directory of your project.
 
 ## Generate query-document pairs
 
-To generate paired labels, first run the embedding models and select the top-k documents for each query from each embedding model.
+To generate paired labels, first run the embedding models and select the top-k documents for each query from each embedding model. Generated files are saved under the folder `./data/task-name/meta_data`.
 
 ```bash
-python generate_pairs.py 
+python generate_pairs.py --task-name example_task --embedding-models voyage-large-2,text-embedding-3-large --topk 20
 ```
 
 ## Label query-document pairs using GPT4
 
-For each query-document pair, use GPT-4 to determine if they are a good match. The document and query are assessed as a pair based on criteria that are divided into four levels: reject (label 1), borderline reject (label 2), borderline accept (label 3), and accept (label 4). We will elect valid pairs (those labeled as 4) and build query-document datasets for text retrieval evaluation. The pairs are saved in the
+For each query-document pair, use GPT-4 to determine if they are a good match. The document and query are assessed as a pair based on criteria that are divided into four levels: reject (label 1), borderline reject (label 2), borderline accept (label 3), and accept (label 4). We will elect valid pairs (those labeled as 4) and build query-document datasets for text retrieval evaluation. The final pairs are saved in `./data/task-name/pairs.jsonl`.
 
 ```bash
-python rate_pairs.py
+python label_pairs.py --task-name example_task --topk 20 --generative-model gpt-4-0125-preview
 ```
