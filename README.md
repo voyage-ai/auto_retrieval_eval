@@ -1,6 +1,16 @@
 # Auto Labelling for Text Retrieval Evaluation
 This repository offers a codebase for generating query-document pairs to assess text retrieval performance. It processes a collection of queries and documents where queries may consist of questions, titles, abstracts, or summaries, and the documents are likely to hold pertinent details concerning these queries. The provided code facilitates the creation of a dataset labeled with GPT-4, specifically designed for evaluating text retrieval capabilities.
 
+## Installation
+
+We recommend using Conda for the installation.
+
+```bash
+conda create -n auto_labeling_env python=3.10
+conda activate auto_labeling_env
+pip install -r requirements.txt
+```
+
 ## Prepare data
 Store the queries and documents in the `data/{task_name}` directory:
 
