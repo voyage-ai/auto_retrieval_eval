@@ -1,13 +1,9 @@
-import argparse
 import random
+import os
 import numpy as np
-from paths import *
-from utils import *
+from config import Config
+from utils import parse_arguments, read_json, read_json_lines, save_json_lines, create_directories
 from embedding.embedding_fn import generate_embedding
-
-parser = argparse.ArgumentParser(description="Generate embeddings and select top-k pairs")
-parser.add_argument("--task_type", type=str, default="", choices=['generate_pairs', 'merge_pairs'])
-args = parser.parse_args()
 
 def read_queries_docs(data_path):
     queries = read_json(f'{data_path}/query.jsonl')
@@ -17,12 +13,12 @@ def read_queries_docs(data_path):
     return queries, corpus
 
 def generate_pairs(data_path, embedding_models, embedding_path, retrieval_path, topk):
-    queries, corpus = read_queries_docs(data_path)
-    
-    queries_id = [k for k,v in queries.items()]
-    queries_list = [v for k,v in queries.items()]
-    documents_id = [k for k,v in corpus.items()]
-    documents = [v['text'] for k,v in corpus.items()]
+    queries = read_json(f'{data_path}/query.jsonl')
+    corpus = read_json(f'{data_path}/corpus.jsonl')
+    queries_id = list(queries.keys())
+    queries_list = [v['text'] for v in queries.values()]
+    documents_id = list(corpus.keys())
+    documents = [v['text'] for v in corpus.values()]
     
     for embedding_model_name in embedding_models:
         model_embedding_path = f'{embedding_path}/{embedding_model_name}_embedding.pickle'
@@ -84,10 +80,11 @@ def merge_pairs(embedding_models, retrieval_path, merged_retrieval_data_path, to
         
 
 def main():
-    if args.task_type == 'generate_pairs':
-        generate_pairs(data_path, embedding_models, embedding_path, retrieval_path, topk)
-    elif args.task_type == 'merge_pairs':    
-        merge_pairs(embedding_models, retrieval_path, merged_retrieval_data_path, topk)
+    args = parse_arguments()
+    config = Config(args)
+    create_directories(config)
+    generate_pairs(config.data_path, config.embedding_models, config.embedding_path, config.retrieval_path, config.topk)
+    merge_pairs(config.embedding_models, config.retrieval_path, config.merged_retrieval_data_path, config.topk)
             
 if __name__ == "__main__":
     main()

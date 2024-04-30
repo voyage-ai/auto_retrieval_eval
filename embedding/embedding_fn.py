@@ -1,5 +1,5 @@
 import os
-from utils import *
+from utils import read_pickle, save_pickle
 from embedding.voyage_fn import VoyageEmbedding
 from embedding.openai_fn import OpenAIEmbedding
 from embedding.cohere_fn import CohereEmbedding

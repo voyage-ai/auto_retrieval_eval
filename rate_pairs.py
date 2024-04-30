@@ -1,13 +1,8 @@
-import argparse
 import re
-from utils import *
-from paths import *
+import os
+from utils import parse_arguments, read_json_lines, save_json_lines
+from config import Config
 from generation.openai_gen_fn import get_gpt4_results
-
-parser = argparse.ArgumentParser(description="build evaluation datasets")
-parser.add_argument("--task_type", type=str, default="", choices=['', 'generate_score', 'parse_score', 'build_dataset'])
-args = parser.parse_args()
-
 
 def generate_label(generative_model, pairs, merged_pair_labels_path):
     if os.path.exists(merged_pair_labels_path):
@@ -97,26 +92,25 @@ def parse_score(merged_pair_labels_path):
     save_json_lines(merged_pair_labels_path, pairs)
 
 def main():
-    if args.task_type == 'generate_score':
-        pairs = read_json_lines(merged_retrieval_data_path)
-        print('there are %d pairs in top %d' % (len(pairs), topk))
-        generate_label(generative_model, pairs, merged_pair_labels_path)
-    
-    elif args.task_type == 'parse_score':
-        parse_score(merged_pair_labels_path)
-    
-    elif args.task_type == 'build_dataset':
-        valid_labels = [4]
-        pairs = read_json_lines(merged_pair_labels_path)
+    args = parse_arguments()
+    config = Config(args)
+    pairs = read_json_lines(config.merged_retrieval_data_path)
+    print('there are %d pairs in top %d' % (len(pairs), config.topk))
+    generate_label(config.generative_model, pairs, config.merged_pair_labels_path)
 
-        valid_pairs = []
-        for pair in pairs:
-            if pair['gpt4_score'] in valid_labels:
-                valid_pairs.append({'query': pair['query'], 'doc': pair['doc'], 'corpus_id': pair['doc_id'], 'query_id': pair['query_id']})
+    parse_score(config.merged_pair_labels_path)
 
-        outname = f'{data_path}/pairs.jsonl'
-        print('save %d pairs to %s' % (len(valid_pairs), outname))
-        save_json_lines(outname, valid_pairs)
+    valid_labels = [4]
+    pairs = read_json_lines(config.merged_pair_labels_path)
+
+    valid_pairs = []
+    for pair in pairs:
+        if pair['gpt4_score'] in valid_labels:
+            valid_pairs.append({'query': pair['query'], 'doc': pair['doc'], 'corpus_id': pair['doc_id'], 'query_id': pair['query_id']})
+
+    outname = f'{config.data_path}/pairs.jsonl'
+    print('save %d pairs to %s' % (len(valid_pairs), outname))
+    save_json_lines(outname, valid_pairs)
     
 if __name__ == "__main__":
     main()

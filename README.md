@@ -21,7 +21,7 @@ Store the queries and documents in the `data/{task_name}` directory:
 Configure settings in `paths.py`: 
 ```python
 # Task name
-task_name = 'legal_summarization_release'
+task_name = 'example_task'
 
 # List of embedding models
 embedding_models = ['voyage-2', 'voyage-code-2', 'text-embedding-3-small', 'text-embedding-3-large', 'embed-english-v3.0', 'mistral', 'googlecloud_textembedding-gecko@latest']
@@ -42,31 +42,13 @@ To configure API keys using environment variables, please store them in a `.env`
 To generate paired labels, first run the embedding models and select the top-k documents for each query from each embedding model.
 
 ```bash
-python generate_pairs.py --task_type generate_pairs
-```
-
-Combine the top-k documents from various embedding models:
-
-```bash
-python generate_pairs.py --task_type merge_pairs
+python generate_pairs.py 
 ```
 
 ## Label query-document pairs using GPT4
 
-For each query-document pair, use GPT-4 to determine if they are a good match. The document and query are assessed as a pair based on criteria that are divided into four levels: reject (label 1), borderline reject (label 2), borderline accept (label 3), and accept (label 4).
+For each query-document pair, use GPT-4 to determine if they are a good match. The document and query are assessed as a pair based on criteria that are divided into four levels: reject (label 1), borderline reject (label 2), borderline accept (label 3), and accept (label 4). We will elect valid pairs (those labeled as 4) and build query-document datasets for text retrieval evaluation. The pairs are saved in the
 
 ```bash
-python main.py --task_type generate_score
-```
-
-Extract labels ranging from 1 to 4, which represent reject, borderline reject, borderline accept, and accept, from the GPT-4 output.
-
-```bash
-python main.py --task_type parse_score
-```
-
-Select valid pairs (those labeled as 4) and build query-document datasets for text retrieval evaluation. The pairs are saved in the `data/{task_name}/pairs.jsonl` folder.
-
-```bash
-python main.py --task_type build_dataset
+python rate_pairs.py
 ```
