@@ -5,7 +5,7 @@ from config import Config
 from utils import parse_arguments, read_json, read_json_lines, save_json_lines, create_directories
 from embedding.embedding_fn import generate_embedding
 
-def generate_pairs(data_path, embedding_models, embedding_path, retrieval_path, topk):
+def prefilter_pairs(data_path, embedding_models, embedding_path, retrieval_path, topk):
     queries = read_json(f'{data_path}/query.jsonl')
     corpus = read_json(f'{data_path}/corpus.jsonl')
     queries_id = list(queries.keys())
@@ -59,7 +59,7 @@ def main():
     args = parse_arguments()
     config = Config(args)
     create_directories(config)
-    generate_pairs(config.data_path, config.embedding_models, config.embedding_path, config.retrieval_path, config.topk)
+    prefilter_pairs(config.data_path, config.embedding_models, config.embedding_path, config.retrieval_path, config.topk)
     merge_pairs(config.embedding_models, config.retrieval_path, config.merged_retrieval_data_path, config.topk)
             
 if __name__ == "__main__":
