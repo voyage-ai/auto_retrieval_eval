@@ -6,12 +6,12 @@ from utils import parse_arguments, read_json, read_json_lines, save_json_lines, 
 from embedding.embedding_fn import generate_embedding
 
 def prefilter_pairs(data_path, embedding_models, embedding_path, retrieval_path, topk):
-    queries = read_json(f'{data_path}/query.jsonl')
-    corpus = read_json(f'{data_path}/corpus.jsonl')
-    queries_id = list(queries.keys())
-    queries_list = [v['text'] for v in queries.values()]
-    documents_id = list(corpus.keys())
-    documents = [v['text'] for v in corpus.values()]
+    queries = read_json_lines(f'{data_path}/queries.jsonl')
+    corpus = read_json_lines(f'{data_path}/corpus.jsonl')
+    queries_id = [v['id'] for v in queries]
+    queries_list = [v['text'] for v in queries]
+    documents_id = [v['id'] for v in corpus]
+    documents = [v['text'] for v in corpus]
     
     for embedding_model_name in embedding_models:
         model_embedding_path = f'{embedding_path}/{embedding_model_name}_embedding.pickle'

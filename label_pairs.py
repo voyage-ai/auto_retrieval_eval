@@ -4,6 +4,7 @@ from utils import parse_arguments, read_json_lines, save_json_lines
 from config import Config
 from generation.openai_gen_fn import get_gpt4_results
 from tqdm import tqdm
+import json
 
 def read_json_if_exists(path):
     if os.path.exists(path):
@@ -64,13 +65,22 @@ def label_pair(pair, prompt, generative_model):
     return pair
 
 def parse_score(merged_pair_labels_path):
+    doc_query_scores = {}
     pairs = read_json_if_exists(merged_pair_labels_path)
     for pair in pairs:
         try:
-            pair['gpt4_score'] = int(parse_digit(pair['gpt4_response']))
+            gpt4_score = int(parse_digit(pair['gpt4_response']))
+            if gpt4_score > 2:
+                if not doc_query_scores.get(pair['query_id']):
+                    doc_query_scores[pair['query_id']] = {}
+                doc_query_scores[pair['query_id']][pair['doc_id']] = int(gpt4_score)
         except ValueError:
             print(f"Error parsing score for {pair['query_id']} {pair['doc_id']}")
-    return pairs
+    
+    # Remove empty doc_query_scores entries
+    doc_query_scores = {query_id: scores for query_id, scores in doc_query_scores.items() if scores}
+    
+    return doc_query_scores
 
 def parse_digit(response_text):
     pattern = r'\\boxed\{([^}]*)\}'
@@ -81,23 +91,15 @@ def parse_digit(response_text):
             return numbers[0]
     return None
 
-def save_valid_pairs(config, pairs):
-    valid_labels = [4]
-    valid_pairs = [p.copy() for p in pairs if p.get('gpt4_score') in valid_labels]
-    for pair in valid_pairs:
-        pair.pop('gpt4_response', None)
-    outname = f'{config.data_path}/pairs.jsonl'
-    print(f'save {len(valid_pairs)} pairs to {outname}')
-    save_json_lines(outname, valid_pairs)
-
 def main():
     args = parse_arguments()
     config = Config(args)
     pairs = read_json_lines(config.merged_retrieval_data_path)
     print(f'there are {len(pairs)} pairs in top {config.topk}')
     generate_label(config.generative_model, pairs, config.merged_pair_labels_path)
-    pairs = parse_score(config.merged_pair_labels_path)
-    save_valid_pairs(config, pairs)
+    doc_query_scores = parse_score(config.merged_pair_labels_path)
+    with open(os.path.join(config.data_path, "relevance.json"), "w") as f:
+        json.dump(doc_query_scores, f)
 
 if __name__ == "__main__":
     main()

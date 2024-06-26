@@ -16,16 +16,16 @@ pip install -r requirements.txt
 ## Prepare data
 Store the queries and documents in the `data/{task_name}` directory:
 
-`query.jsonl` should include the query id and query text.
+`queries.jsonl` should include the query id and query text.
 ```json
-"00000": {"text": "This is the text of the first query."},
-"00001": {"text": "This is the text of the second query."},
+{"id": "00000", "text": "This is the text of the first query."}
+{"id": "00001", "text": "This is the text of the second query."}
 ```
 
 `corpus.jsonl` should contain the document id and document text.
 ```json
-"000000000": {"text": "This is the text of the first document."},
-"000000001": {"text": "This is the text of the second document."},
+{"id":"000000000", "text": "This is the text of the first document."}
+{"id":"000000001", "text": "This is the text of the second document."}
 ```
 
 ## API Key Configuration
@@ -42,8 +42,8 @@ python prefilter_pairs.py --task-name example_task --embedding-models voyage-lar
 
 ## Label prefiltered pairs using GPT4
 
-For each prefiltered pair, use GPT-4 to determine if they constitute a relevant match. The document and query are assessed as a pair based on criteria that are divided into four levels: reject (label 1), borderline reject (label 2), borderline accept (label 3), and accept (label 4). We will elect valid pairs (those labeled as 4) and build query-document datasets for text retrieval evaluation. The final pairs are saved in `./data/task-name/pairs.jsonl`.
+For each prefiltered pair, use GPT-4 to determine if they constitute a relevant match. The document and query are assessed as a pair based on criteria that are divided into four levels: reject (label 1), borderline reject (label 2), borderline accept (label 3), and accept (label 4). We will elect valid pairs (those labeled as [3,4]) and build query-document datasets for text retrieval evaluation. The final pairs are saved in `./data/task-name/relevance.json`. This file contains one dictionary, where relevance is indexed as relevance[query_id][document_id].
 
 ```bash
-python label_pairs.py --task-name example_task --topk 20 --generative-model gpt-4-0125-preview
+python label_pairs.py --task-name example_task --topk 20 --generative-model gpt-4o
 ```
